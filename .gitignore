@@ -1,1 +1,5 @@
+# Python virtualenv
 env/
+
+# Packaged Lambda function
+s3-web-proxy.zip

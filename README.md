@@ -6,6 +6,5 @@ Specifically aimed at notifying an application of an S3 PUT event, making the pr
 
 TODO:
 - Change to PUT to be more semantically correct (?)
-- Terraform module to deploy things
 - Cloudformation to deploy things
   - Launch stack button
