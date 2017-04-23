@@ -6,4 +6,15 @@ all: build
 $(PACKAGE_NAME): $(SOURCES)
 	zip -9 $(PACKAGE_NAME) $(SOURCES)
 
-build: $(PACKAGE_NAME)
+build: test $(PACKAGE_NAME)
+
+.PHONY: test
+test: lint unit
+
+.PHONY: lint
+lint:
+	flake8 --exclude env/
+
+.PHONY: unit
+unit:
+	python -m unittest discover

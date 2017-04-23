@@ -3,3 +3,13 @@ env/
 
 # Packaged Lambda function
 s3-web-proxy.zip
+
+# Compiled binaries
+*.pyc
+
+# Unit test / coverage reports
+.coverage
+
+# Terraform state and modules
+**/terraform.tfstate*
+**/.terraform/*
