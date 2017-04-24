@@ -1,8 +1,9 @@
-# Python virtualenv
+# Python virtualenv and packaged requirements
 env/
+vendored/
 
 # Packaged Lambda function
-s3-web-proxy.zip
+s3-web-service-proxy.zip
 
 # Compiled binaries
 *.pyc

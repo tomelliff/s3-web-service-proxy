@@ -66,20 +66,6 @@ class TestHandler(unittest.TestCase):
                          self.expected_response)
 
 
-class TestMethodRequest(unittest.TestCase):
-    def test_no_method_specified_uses_get(self):
-        self.assertEqual(
-            s3_web_service_proxy.MethodRequest(
-                'http://example.com').get_method(),
-            'GET')
-
-    def test_method_overridden(self):
-        self.assertEqual(
-            s3_web_service_proxy.MethodRequest(
-                'http://example.com', method='PUT').get_method(),
-            'PUT')
-
-
 class TestHttpCall(unittest.TestCase):
     def test_proxy_puts_event(self):
         self.assertEquals(json.loads(
