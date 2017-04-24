@@ -4,10 +4,13 @@ import os
 import unittest
 
 from mock import patch
+import requests
 
 import s3_web_service_proxy
 
 
+@patch('s3_web_service_proxy.proxy_event_to_web_service',
+       return_value=(200, 'foo'))
 class TestHandler(unittest.TestCase):
     s3_put_event = json.loads("""{
   "Records": [
@@ -51,38 +54,30 @@ class TestHandler(unittest.TestCase):
     expected_response = {'statusCode': 200,
                          'body': 'foo'}
 
-    @patch('s3_web_service_proxy.proxy_event_to_web_service')
     def test_handler_passes_correct_args(self, mock_proxy):
         os.environ['ENDPOINT_URL'] = 'http://example.org'
         s3_web_service_proxy.handler(self.s3_put_event, 'context')
         mock_proxy.assert_called_once_with(json.dumps(self.s3_put_event),
                                            'http://example.org')
 
-    @patch('s3_web_service_proxy.proxy_event_to_web_service',
-           return_value='foo')
     def test_handler_returns_response(self, mock_proxy):
         self.assertEqual(s3_web_service_proxy.handler(self.s3_put_event,
                                                       'context'),
                          self.expected_response)
 
 
-class TestMethodRequest(unittest.TestCase):
-    def test_no_method_specified_uses_get(self):
-        self.assertEqual(
-            s3_web_service_proxy.MethodRequest(
-                'http://example.com').get_method(),
-            'GET')
-
-    def test_method_overridden(self):
-        self.assertEqual(
-            s3_web_service_proxy.MethodRequest(
-                'http://example.com', method='PUT').get_method(),
-            'PUT')
-
-
 class TestHttpCall(unittest.TestCase):
     def test_proxy_puts_event(self):
-        self.assertEquals(json.loads(
+        self.assertEquals(s3_web_service_proxy.proxy_event_to_web_service(
+                            'event', 'http://httpbin.org/put')[0],
+                          200)
+        self.assertEquals(s3_web_service_proxy.proxy_event_to_web_service(
+                            'event', 'http://httpbin.org/put')[1]['data'],
+                          'event')
+
+    def test_bad_status_is_raised(self):
+        with self.assertRaises(requests.exceptions.HTTPError) as context:
             s3_web_service_proxy.proxy_event_to_web_service(
-                'event', 'http://httpbin.org/put'))['data'],
-            'event')
+                'event', 'http://httpbin.org/status/500')
+
+        self.assertTrue('INTERNAL SERVER ERROR' in str(context.exception))
