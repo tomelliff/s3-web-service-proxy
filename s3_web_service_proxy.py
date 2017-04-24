@@ -14,12 +14,12 @@ def handler(event, context):
     endpoint_url = os.environ['ENDPOINT_URL']
     event_json_string = json.dumps(event)
 
-    web_service_response = proxy_event_to_web_service(event_json_string,
-                                                      endpoint_url)
+    status_code, body = proxy_event_to_web_service(event_json_string,
+                                                   endpoint_url)
 
     response = {
-        "statusCode": 200,
-        "body": web_service_response
+        "statusCode": status_code,
+        "body": body
     }
 
     return response
@@ -28,4 +28,6 @@ def handler(event, context):
 def proxy_event_to_web_service(event, endpoint_url):
     r = requests.put(endpoint_url, data=event)
 
-    return r.text
+    r.raise_for_status()
+
+    return r.status_code, r.json()
